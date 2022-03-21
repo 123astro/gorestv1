@@ -6,7 +6,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -30,7 +29,21 @@ public class UserController {
     ) {
         try {
             String url = "https://gorest.co.in/public/v2/users/" + userId;
-            return restTemplate.getForObject(url, Object.class);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(env.getProperty("GOREST_TOKEN"));
+            HttpEntity request = new HttpEntity(headers);
+
+            return restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    request,
+                    Object.class
+            );
+
+           // return restTemplate.getForObject(url, Object.class);
+
+
         } catch (Exception exception) {
             return "404: No user exist with the ID " + userId;
         }
