@@ -19,7 +19,7 @@ public class UserController {
     // url / endpoint http://localhost:4444/api/user/token
     @GetMapping("/token")
     public String getToken() {
-        return env.getProperty("GOREST_TOKEN");
+        return env.getProperty("GO_REST_TOKEN");
     }
 
     //URL / endpoint GET http://localhost:4444/api/user/{id}
@@ -29,20 +29,23 @@ public class UserController {
     ) {
         try {
             String url = "https://gorest.co.in/public/v2/users/" + userId;
+            String apiToken =env.getProperty("GO_REST_TOKEN");
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.setBearerAuth(env.getProperty("GOREST_TOKEN"));
-            HttpEntity request = new HttpEntity(headers);
-
-            return restTemplate.exchange(
-                    url,
-                    HttpMethod.GET,
-                    request,
-                    Object.class
-            );
+//            HttpHeaders headers = new HttpHeaders();
+//            headers.setBearerAuth(env.getProperty("GO_REST_TOKEN"));
+//            HttpEntity request = new HttpEntity(headers);
+//
+//            return restTemplate.exchange(
+//                    url,
+//                    HttpMethod.GET,
+//                    request,
+//                    Object.class
+//            );
 
            // return restTemplate.getForObject(url, Object.class);
+        url += "?access-token=" + apiToken;
 
+        return restTemplate.getForObject(url, Object.class);
 
         } catch (Exception exception) {
             return "404: No user exist with the ID " + userId;
