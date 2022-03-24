@@ -70,6 +70,8 @@ public class UserModel {
         this.status = status;
     }
 
+   // public String generateReport(){return}
+
     @Override
     public String toString(){
         return "UserModel{" + "id=" + id + ", name='" + name + '\'' + ", email=" + email + '\'' + ", gender="

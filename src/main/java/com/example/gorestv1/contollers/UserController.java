@@ -2,16 +2,17 @@ package com.example.gorestv1.contollers;
 
 
 import com.example.gorestv1.models.UserModel;
+import com.example.gorestv1.models.UserModelArray;
 import jdk.swing.interop.SwingInterOpUtils;
 import org.apache.tomcat.util.net.jsse.JSSEUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/user")
@@ -20,17 +21,51 @@ public class UserController {
     @Autowired
     Environment env;
 
-    // url / endpoint http://localhost:4444/api/user/token
+    // URL / endpoint http://localhost:4444/api/user/token
     @GetMapping("/token")
     public String getToken() {
         return env.getProperty("GO_REST_TOKEN");
     }
 
-    //URL / endpoint GET http://localhost:4444/api/user/{id}
+    // URL / endpoint GET http://localhost:4444/api/user/firstpage
+    @GetMapping("/page/{pageNum}")
+    public Object getPage(RestTemplate restTemplate, @PathVariable("pageNum") String pageNumber) {
+        try {
+
+            //String url = "https://gorest.co.in/public/v2/users/";
+            String url = "https://gorest.co.in/public/v2/users?page=" + pageNumber;
+
+            ResponseEntity<UserModel[]> response = restTemplate.getForEntity(url, UserModel[].class);
+
+            UserModel[] firstPageUsers = response.getBody();
+
+            HttpHeaders responseHeaders = response.getHeaders();
+            String totalPages = Objects.requireNonNull(responseHeaders.get("X-Pagination-Pages")).get(0);
+
+            System.out.println("Total Pages: " + totalPages);
+
+            return new ResponseEntity<>(firstPageUsers, HttpStatus.OK);
+//
+//            for (int i = 0; i < firstPageUsers.length; i++) {
+//                UserModel tempUser = firstPageUsers[i];
+//                System.out.println(tempUser.toString());
+//
+//            }
+//
+//            return firstPage;
+
+        } catch (Exception e) {
+            System.out.println(e.getClass());
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    // URL / endpoint GET http://localhost:4444/api/user/{id}
     @GetMapping("/{id}")
     public Object getOneUser(@PathVariable("id") String userId,
-                             RestTemplate restTemplate)
-    {
+                             RestTemplate restTemplate) {
         try {
             String url = "https://gorest.co.in/public/v2/users/" + userId;
             String apiToken = env.getProperty("GO_REST_TOKEN");
@@ -77,30 +112,91 @@ public class UserController {
         }
     }
 
-    @PostMapping ("/")
-    public Object postUser (
-            @RequestParam ("name") String name,
-            @RequestParam ("email") String email,
-            @RequestParam ("gender") String gender,
-            @RequestParam ("status") String status
+//    @PostMapping ("/")
+//    public Object postUser (
+//            @RequestParam ("name") String name,
+//            @RequestParam ("email") String email,
+//            @RequestParam ("gender") String gender,
+//            @RequestParam ("status") String status
+//    ) {
+//        try {
+//            String url = "https://gorest.co.in/public/v2/users/";
+//            String token = env.getProperty("GO_REST_TOKEN");
+//            url += "?access-token=" + token;
+//
+//            UserModel newUser =new UserModel(name, email, gender, status);
+//
+//            //TODO: validate that gender and status are valid before continuing
+//
+//            //TODO: validate that the email is valid email
+//
+//            return  "Created new user";
+//
+//
+//        } catch (Exception exception){
+//            System.out.println(exception.getClass());
+//            return exception.getMessage();
+//        }
+
+    @PostMapping("/qp")
+    public Object postUserQueryParameter(
+            @RequestParam("name") String name,
+            @RequestParam("email") String email,
+            @RequestParam("gender") String gender,
+            @RequestParam("status") String status,
+            RestTemplate restTemplate
     ) {
         try {
             String url = "https://gorest.co.in/public/v2/users/";
             String token = env.getProperty("GO_REST_TOKEN");
-            url += "access-token=" + token;
+            url += "?access-token=" + token;
 
-            UserModel newUser =new UserModel(name, email, gender, status);
+            UserModel newUser = new UserModel(name, email, gender, status);
+
+//            HttpHeaders headers = new HttpHeaders();
+//            assert token != null;
+//            headers.setBearerAuth(token);
+//            HttpEntity request = new HttpEntity(newUser, headers);
+
+            HttpEntity request = new HttpEntity(newUser);
 
             //TODO: validate that gender and status are valid before continuing
 
             //TODO: validate that the email is valid email
 
-            return  "Created new user";
+            return restTemplate.postForEntity(url, request, UserModel.class);
 
 
-        } catch (Exception exception){
+        } catch (Exception exception) {
             System.out.println(exception.getClass());
             return exception.getMessage();
         }
     }
+
+    @PostMapping("/")
+    public ResponseEntity postUser(
+            RestTemplate restTemplate,
+            @RequestBody UserModel newUser
+    ) {
+        try {
+            String url = "https://gorest.co.in/public/v2/users/";
+            String token = env.getProperty("GO_REST_TOKEN");
+            url += "?access-token=" + token;
+
+            HttpEntity<UserModel> request = new HttpEntity<>(newUser);
+
+            return restTemplate.postForEntity(url, request, UserModel.class);
+        } catch (Exception e) {
+            System.out.println(e.getClass() + " \n " + e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+//    @PutMapping("/{id}")
+//    public ResponseEntity
+
+    // Serialized Spring boot data is JSON data
+    // Deserialized Spring boot data is an Object
+
+    // link plug in post man
 }
