@@ -13,7 +13,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class UserModel {
     private int id;
-
     private String name;
     private String email;
     private String gender;
