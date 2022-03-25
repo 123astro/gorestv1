@@ -80,7 +80,7 @@ public class UserController {
 
             HttpHeaders responseHeaders = response.getHeaders();
             String totalPages = Objects.requireNonNull(responseHeaders.get("X-Pagination-Pages")).get(0);
-            int totalPageNum = 20; //Integer.parseInt(totalPages);
+            int totalPageNum = Integer.parseInt(totalPages);
 
 
 
