@@ -75,30 +75,19 @@ public class UserController {
 
             ResponseEntity<UserModel[]> response = restTemplate.getForEntity(url, UserModel[].class);
 
-           // UserModel[] firstPageUsers = response.getBody();
-            allUsers.addAll(Arrays.asList(Objects.requireNonNull(response.getBody())));
+            allUsers.addAll(Arrays.asList(Objects.requireNonNull(response.getBody()))); //get the first page
 
+            // getting the total number of pages
             HttpHeaders responseHeaders = response.getHeaders();
             String totalPages = Objects.requireNonNull(responseHeaders.get("X-Pagination-Pages")).get(0);
             int totalPageNum = Integer.parseInt(totalPages);
-
-
 
             for (int i = 2; i <= totalPageNum; i++) {
                 UserModel[] pageOfUsers = restTemplate.getForObject(url + "?page=" + i , UserModel[].class);
                 allUsers.addAll(Arrays.asList(pageOfUsers));
             }
                 System.out.println("Total Pages: " + totalPages);
-
                 return new ResponseEntity<>(allUsers, HttpStatus.OK);
-//
-//            for (int i = 0; i < firstPageUsers.length; i++) {
-//                UserModel tempUser = firstPageUsers[i];
-//                System.out.println(tempUser.toString());
-//
-//            }
-//
-//            return firstPage;
 
             } catch(Exception e){
                 System.out.println(e.getClass());
@@ -238,8 +227,12 @@ public class UserController {
             }
         }
 
-//    @PutMapping("/{id}")
-//    public ResponseEntity
+//      @PutMapping("/{id}")
+//    public ResponseEntity putUser(
+//
+//            RestTemplate restTemplate,
+//            @RequestBody UserModel updateData
+//      )
 
         // Serialized Spring boot data is JSON data
         // Deserialized Spring boot data is an Object
