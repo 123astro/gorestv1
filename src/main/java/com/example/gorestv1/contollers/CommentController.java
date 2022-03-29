@@ -59,27 +59,29 @@ public class CommentController {
             System.out.println(e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
 
     @PostMapping
-    public ResponseEntity<Object> postComment(RestTemplate restTemplate, @ResponseBody CommentModel newComment
+    public ResponseEntity<Object> postComment(RestTemplate restTemplate, @RequestBody CommentModel newComment
     ) {
         try {
-            String url = "https://gorest.co.in/public/v2/comments"
-            String token = evn.getProperty("GO_REST_TOKEN");
-            url += "?access-token=" + token;
+        String url = "https://gorest.co.in/public/v2/comments";
+        String token = evn.getProperty("GO_REST_TOKEN");
+        url += "?access-token=" + token;
 
+        HttpEntity<CommentModel> request = new HttpEntity<>(newComment);
+        CommentModel createComment = restTemplate.postForObject(url, request, CommentModel.class);
+        return new ResponseEntity<>(createComment, HttpStatus.CREATED);
 
-            HttpEntity<CommentModel> request = new HttpEntity<>(newComment);
-
-            CommentModel createdComment = restTemplate.postForObject(url, request)
-
-        }
-
+    } catch (Exception e) {
+        System.out.println(e.getClass());
+        System.out.println(e.getMessage());
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+}
 
-    @PutMapping
+
+    @PutMapping ("/{id}")
     public ResponseEntity<Object> putComment(
             RestTemplate restTemplate,
             @RequestBody CommentModel updateComment
