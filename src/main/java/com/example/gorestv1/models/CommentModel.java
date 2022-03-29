@@ -31,7 +31,7 @@ public class CommentModel {
         return id;
     }
 
-    public int getPost_id() {
+    public int getPostId() {
         return postId;
     }
 
