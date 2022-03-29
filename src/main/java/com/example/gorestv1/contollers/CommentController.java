@@ -1,6 +1,7 @@
 package com.example.gorestv1.contollers;
 
 
+import com.example.gorestv1.models.CommentModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,9 +13,13 @@ public class CommentController {
 
 
     @GetMapping("/firstpage")
-    public Object getFirstPage (RestTemplate restTemplate){
+    public CommentModel getFirstPage (RestTemplate restTemplate){
         String url = "https://gorest.co.in/public/v2/comments";
-        return restTemplate.getForObject(url, Object.class); //no headers needed => getForObject
+        CommentModel comment = restTemplate.getForObject(url, CommentModel.class);
+
+        return comment;
+
+        // return restTemplate.getForObject(url, CommentModel.class); //no headers needed => getForObject
 
     }
 }
