@@ -227,15 +227,32 @@ public class UserController {
         }
     }
 
-//      @PutMapping("/{id}")
-//    public ResponseEntity putUser(
-//
-//            RestTemplate restTemplate,
-//            @RequestBody UserModel updateData
-//      )
+    @PutMapping("/{id}")
+    public ResponseEntity putUser(
 
+            RestTemplate restTemplate,
+            @RequestBody UserModel updateData
+    ) {
+        try {
+            String url = "https://gorest.co.in/public/v2/users/" + updateData.getId();
+            String token = env.getProperty("GO_REST_TOKEN");
+            url += "?access-token=" + token;
+
+            HttpEntity<UserModel> request = new HttpEntity<>(updateData);
+
+            ResponseEntity<UserModel> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.PUT,
+                    request,
+                    UserModel.class
+            );
+            return new ResponseEntity(response.getBody(), HttpStatus.OK);
+        } catch (HttpClientErrorException.UnprocessableEntity e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+    }
+}
     // Serialized Spring boot data is JSON data
     // Deserialized Spring boot data is an Object
 
     // link plug in post man
-}
