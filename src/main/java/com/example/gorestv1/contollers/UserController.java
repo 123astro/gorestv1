@@ -67,7 +67,7 @@ public class UserController {
         }
     }
 
-    @GetMapping("/page/all")
+    @GetMapping("/all")
     public Object getAll(RestTemplate restTemplate) {
         try {
             ArrayList<UserModel> allUsers = new ArrayList<UserModel>();
