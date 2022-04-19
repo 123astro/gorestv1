@@ -221,6 +221,7 @@ public class UserController {
             HttpEntity<UserModel> request = new HttpEntity<>(newUser);
 
             return restTemplate.postForEntity(url, request, UserModel.class);
+
         } catch (Exception e) {
             System.out.println(e.getClass() + " \n " + e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -252,7 +253,7 @@ public class UserController {
         }
     }
 }
-    // Serialized Spring boot data is JSON data
-    // Deserialized Spring boot data is an Object
+// Serialized Spring boot data is JSON data
+// Deserialized Spring boot data is an Object
 
-    // link plug in post man
+// link plug in post man
